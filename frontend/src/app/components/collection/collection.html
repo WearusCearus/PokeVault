@@ -1,0 +1,82 @@
+<div class="collection">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">My Collection</h1>
+      <p class="page-sub">{{ filteredCards().length }} cards in your collection</p>
+    </div>
+    <div style="display:flex; gap:10px; align-items:flex-end; flex-direction:column;">
+      <div style="display:flex; gap:10px; align-items:center;">
+        <!--<button class="refresh-btn" (click)="refreshPrices()" [disabled]="isRefreshing()">-->
+
+        <!--  {{ isRefreshing() ? 'Refreshing...' : '🔄 Refresh Prices' }}-->
+
+        <!--</button>-->
+
+        <input
+          class="search-input"
+          [value]="searchQuery()"
+          (input)="updateSearch($any($event.target).value)"
+          placeholder="Search cards..."
+        />
+      </div>
+      @if (lastRefresh()) {
+        <p style="font-size:11px; color:#666b80;">Last updated: {{ lastRefresh() }}</p>
+      }
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error">⚠️ {{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Loading your collection...</div>
+  }
+
+  @if (!isLoading()) {
+
+    <div class="add-form">
+      <h2 class="form-title">Add a Card</h2>
+      <div class="form-row">
+        <input class="form-input" [(ngModel)]="newCard.name"          placeholder="Card name" />
+        <input class="form-input" [(ngModel)]="newCard.current_price" placeholder="Price" type="number" />
+        <input class="form-input" [(ngModel)]="newCard.rarity"        placeholder="Rarity" />
+        <input class="form-input" [(ngModel)]="newCard.emoji"         placeholder="Emoji" />
+        <button class="add-btn" (click)="addCard()">Add Card</button>
+      </div>
+    </div>
+
+    @if (filteredCards().length === 0 && !searchQuery()) {
+      <p class="empty">No cards yet. Add one above!</p>
+    }
+
+    @if (filteredCards().length === 0 && searchQuery()) {
+      <p class="empty">No cards match "{{ searchQuery() }}"</p>
+    }
+
+    <div class="card-grid">
+      @for (card of filteredCards(); track card.id) {
+        <div class="card">
+
+          @if (card.image) {
+            <img class="card-image" [src]="card.image" [alt]="card.name" />
+          } @else {
+            <div class="card-emoji">{{ card.emoji }}</div>
+          }
+
+          <div class="card-info">
+            <h3 class="card-name">{{ card.name }}</h3>
+            <p class="card-rarity">{{ card.rarity }}</p>
+            <p class="card-price">${{ card.current_price }}</p>
+          </div>
+
+          <button class="delete-btn" (click)="deleteCard(card.id!)">🗑</button>
+
+        </div>
+      }
+    </div>
+
+  }
+
+</div>

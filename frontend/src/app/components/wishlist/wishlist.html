@@ -1,0 +1,92 @@
+<div class="wishlist">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Wishlist</h1>
+      <p class="page-sub">{{ filteredItems().length }} cards you want</p>
+    </div>
+    <div style="display:flex; gap:10px; align-items:flex-end; flex-direction:column;">
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="refresh-btn" (click)="refreshPrices()" [disabled]="isRefreshing()">
+          {{ isRefreshing() ? 'Refreshing...' : '🔄 Refresh Prices' }}
+        </button>
+        <input
+          class="search-input"
+          [value]="searchQuery()"
+          (input)="updateSearch($any($event.target).value)"
+          placeholder="Search wishlist..."
+        />
+      </div>
+      @if (lastRefresh()) {
+        <p style="font-size:11px; color:#666b80;">Last updated: {{ lastRefresh() }}</p>
+      }
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error">⚠️ {{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Loading your wishlist...</div>
+  }
+
+  @if (!isLoading()) {
+
+    <div class="add-form">
+      <h2 class="form-title">Add to Wishlist</h2>
+      <div class="form-row">
+        <input class="form-input" [(ngModel)]="newItem.name"          placeholder="Card name" />
+        <input class="form-input" [(ngModel)]="newItem.current_price" placeholder="Price" type="number" />
+        <input class="form-input" [(ngModel)]="newItem.rarity"        placeholder="Rarity" />
+        <input class="form-input" [(ngModel)]="newItem.emoji"         placeholder="Emoji" />
+        <select class="form-input" [(ngModel)]="newItem.priority">
+          <option value="low">Low Priority</option>
+          <option value="med">Med Priority</option>
+          <option value="high">High Priority</option>
+        </select>
+        <button class="add-btn" (click)="addItem()">Add to Wishlist</button>
+      </div>
+    </div>
+
+    @if (filteredItems().length === 0 && !searchQuery()) {
+      <p class="empty">No items yet. Add one above!</p>
+    }
+
+    @if (filteredItems().length === 0 && searchQuery()) {
+      <p class="empty">No items match "{{ searchQuery() }}"</p>
+    }
+
+    <div class="wishlist-list">
+      @for (item of filteredItems(); track item.id) {
+        <div class="wishlist-item">
+
+          @if (item.image) {
+            <img class="item-image" [src]="item.image" [alt]="item.name" />
+          } @else {
+            <div class="item-emoji">{{ item.emoji }}</div>
+          }
+
+          <div class="item-info">
+            <h3 class="item-name">{{ item.name }}</h3>
+            <p class="item-rarity">{{ item.rarity }}</p>
+          </div>
+
+          <div class="item-price">${{ item.current_price }}</div>
+
+          <div
+            class="priority-badge"
+            [style.background]="priorityColor(item.priority)"
+          >
+            {{ item.priority }}
+          </div>
+
+          <button class="delete-btn" (click)="removeItem(item.id!)">🗑</button>
+
+        </div>
+      }
+    </div>
+
+  }
+
+</div>

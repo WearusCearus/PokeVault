@@ -1,0 +1,77 @@
+<div class="search-page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Search Cards</h1>
+      <p class="page-sub">Search the Pokémon TCG database and add cards to your collection</p>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input
+      class="search-input"
+      [value]="searchQuery()"
+      (input)="updateSearch($any($event.target).value)"
+      (keyup.enter)="search()"
+      placeholder="Search for a card e.g. Charizard..."
+    />
+    <button class="search-btn" (click)="search()">Search</button>
+  </div>
+
+  @if (successMessage()) {
+    <div class="success">✅ {{ successMessage() }}</div>
+  }
+
+  @if (errorMessage()) {
+    <div class="error">⚠️ {{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Searching...</div>
+  }
+
+  @if (results().length > 0) {
+    <p class="results-count">{{ results().length }} cards found</p>
+
+    <div class="results-grid">
+      @for (card of results(); track card.api_id) {
+        <div class="result-card">
+
+          @if (card.image) {
+            <img class="card-image" [src]="card.image" [alt]="card.name" />
+          } @else {
+            <div class="card-image-placeholder">🃏</div>
+          }
+
+          <div class="card-info">
+            <h3 class="card-name">{{ card.name }}</h3>
+            <p class="card-set">{{ card.set_name }}</p>
+            <p class="card-rarity">{{ card.rarity }}</p>
+            <p class="card-price">
+              @if (card.current_price > 0) {
+                ${{ card.current_price }}
+              } @else {
+                No price data
+              }
+            </p>
+          </div>
+
+          <div class="card-actions">
+            <button class="add-btn" (click)="addToCollection(card)">
+              + Collection
+            </button>
+            <button class="wishlist-btn" (click)="addToWishlist(card)">
+              ⭐ Wishlist
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading() && results().length === 0 && searchQuery()) {
+    <p class="empty">No cards found for "{{ searchQuery() }}"</p>
+  }
+
+</div>
