@@ -16,7 +16,7 @@ A full stack Pokémon TCG collection tracker with real-time market prices, wishl
 - **Dashboard** — total collection value, most valuable cards, and recently added at a glance
 - **Authentication** — email/password and Google OAuth via Supabase Auth
 - **Multi-user** — each account is completely private with row-level security
-- **Demo Mode** — read-only demo account with backend enforcement
+- **Demo Mode** — read-only demo account to test features
 
 ---
 
