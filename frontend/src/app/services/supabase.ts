@@ -37,7 +37,7 @@ export class SupabaseService {
     return this.supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://poke-vault-bid753y0e-wearuscearus-projects.vercel.app/dashboard'
+        redirectTo: 'https://thepokefolio.vercel.app/dashboard'
       }
     });
   }

@@ -11,7 +11,7 @@ app.use(cors({
   origin: [
     'http://localhost:4200',
     'https://pokevault-production-0f04.up.railway.app',
-    'https://poke-vault-bid753y0e-wearuscearus-projects.vercel.app'
+    'https://thepokefolio.vercel.app'
   ]
 }));
 app.use(express.json());
