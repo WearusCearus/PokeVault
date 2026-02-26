@@ -1,0 +1,63 @@
+<div class="demo-page">
+  <div class="demo-card">
+
+    <div class="demo-header">
+      <h1 class="demo-logo">PokéVault</h1>
+      <div class="demo-badge">Live Demo</div>
+    </div>
+
+    <p class="demo-description">
+      A full stack Pokémon TCG collection tracker built with Angular 20,
+      Node.js, and Supabase. Track your cards, monitor real market prices,
+      and manage your wishlist.
+    </p>
+
+    <div class="feature-list">
+      <div class="feature">
+        <span class="feature-icon">⚡</span>
+        <div>
+          <p class="feature-title">Real-time Prices</p>
+          <p class="feature-sub">Live TCGPlayer market data</p>
+        </div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🗂</span>
+        <div>
+          <p class="feature-title">Collection Tracker</p>
+          <p class="feature-sub">Manage your card collection</p>
+        </div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">⭐</span>
+        <div>
+          <p class="feature-title">Wishlist</p>
+          <p class="feature-sub">Track cards you want with priorities</p>
+        </div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🔍</span>
+        <div>
+          <p class="feature-title">Card Search</p>
+          <p class="feature-sub">Search the full Pokémon TCG database</p>
+        </div>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error">⚠️ {{ errorMessage() }}</div>
+    }
+
+    <button
+      class="demo-btn"
+      (click)="enterDemo()"
+      [disabled]="isLoading()"
+    >
+      {{ isLoading() ? 'Loading demo...' : 'Enter Demo →' }}
+    </button>
+
+    <p class="demo-note">
+      Logs in as a pre-loaded demo account. No sign up required.
+    </p>
+
+  </div>
+</div>

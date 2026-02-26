@@ -21,11 +21,11 @@
 
   <!-- MESSAGES -->
   @if (successMessage()) {
-    <div class="success">✅ {{ successMessage() }}</div>
+    <div class="success">{{ successMessage() }}</div>
   }
 
   @if (errorMessage()) {
-    <div class="error">⚠️ {{ errorMessage() }}</div>
+    <div class="error">{{ errorMessage() }}</div>
   }
 
   <!-- LOADING -->
@@ -89,9 +89,9 @@
         <p class="modal-sub">Select a priority level</p>
 
         <div class="modal-options">
-          <button class="modal-opt low"  (click)="confirmAddToWishlist('low')">🔵 Low</button>
-          <button class="modal-opt med"  (click)="confirmAddToWishlist('med')">🟡 Med</button>
-          <button class="modal-opt high" (click)="confirmAddToWishlist('high')">🔴 High</button>
+          <button class="modal-opt low"  (click)="confirmAddToWishlist('low')">Low</button>
+          <button class="modal-opt med"  (click)="confirmAddToWishlist('med')">Med</button>
+          <button class="modal-opt high" (click)="confirmAddToWishlist('high')">High</button>
         </div>
 
         <button class="modal-cancel" (click)="cancelPrompt()">Cancel</button>

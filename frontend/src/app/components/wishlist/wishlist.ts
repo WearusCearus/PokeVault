@@ -2,6 +2,8 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardService, WishlistItem } from '../../services/card';
+import { DemoService } from '../../services/demo';
+
 
 @Component({
   selector: 'app-wishlist',
@@ -19,11 +21,31 @@ export class WishlistComponent implements OnInit {
   searchQuery  = signal('');
   lastRefresh  = signal<string>('');
 
-  filteredItems = computed(() =>
-    this.items().filter(item =>
-      item.name.toLowerCase().includes(this.searchQuery().toLowerCase())
-    )
-  );
+  sortBy = signal('created_at');
+
+  filteredItems = computed(() => {
+    const query = this.searchQuery().toLowerCase();
+
+    const filtered = this.items().filter(item =>
+      item.name.toLowerCase().includes(query)
+    );
+
+    const sort = this.sortBy();
+    const priorityOrder: Record<string, number> = { high: 0, med: 1, low: 2 };
+
+    return [...filtered].sort((a, b) => {
+      if (sort === 'price_high') return b.current_price - a.current_price;
+      if (sort === 'price_low')  return a.current_price - b.current_price;
+      if (sort === 'name')       return a.name.localeCompare(b.name);
+      if (sort === 'rarity')     return (a.rarity || '').localeCompare(b.rarity || '');
+      if (sort === 'priority')   return (priorityOrder[a.priority] ?? 2) - (priorityOrder[b.priority] ?? 2);
+      return 0;
+    });
+  });
+
+  updateSort(value: string) {
+    this.sortBy.set(value);
+  }
 
   newItem: WishlistItem = {
     name:          '',
@@ -33,7 +55,9 @@ export class WishlistComponent implements OnInit {
     emoji:         ''
   };
 
-  constructor(private cardService: CardService) {}
+  constructor(
+    private cardService: CardService,   
+    public demoService: DemoService) {}
 
   ngOnInit() {
     this.loadWishlist();
@@ -95,6 +119,12 @@ export class WishlistComponent implements OnInit {
   }
 
   addItem() {
+    if (this.demoService.isDemoMode()) {
+      this.errorMessage.set('Demo mode — sign up to build your own wishlist!');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
     if (!this.newItem.name) return;
 
     this.cardService.addToWishlist(this.newItem).subscribe({
@@ -110,6 +140,11 @@ export class WishlistComponent implements OnInit {
   }
 
   removeItem(id: number) {
+    if (this.demoService.isDemoMode()) {
+      this.errorMessage.set('Demo mode — sign up to manage your own wishlist!');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
     this.cardService.removeFromWishlist(id).subscribe({
       next: () => this.loadWishlist(),
       error: (err) => {
@@ -126,6 +161,8 @@ export class WishlistComponent implements OnInit {
   }
 
   setPriority(item: WishlistItem, priority: string) {
+    if (this.demoService.isDemoMode()) return;
+    
     this.cardService.updatePriority(item.id!, priority).subscribe({
       next: () => {
         this.items.update(items =>

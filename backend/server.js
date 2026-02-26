@@ -10,6 +10,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({ origin: 'http://localhost:4200' }));
 app.use(express.json());
 
+// DEMO USER
+const DEMO_USER_ID = '18cc069b-6518-4a98-8a00-e997448bdf7e';
+
 // AUTH MIDDLEWARE
 async function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -42,6 +45,14 @@ async function requireAuth(req, res, next) {
   }
 }
 
+// DEMO BLOCK MIDDLEWARE
+function blockDemo(req, res, next) {
+  if (req.user.id === DEMO_USER_ID) {
+    return res.status(403).json({ error: 'Demo account is read-only.' });
+  }
+  next();
+}
+
 // CARDS ROUTES
 
 app.get('/api/cards', requireAuth, async (req, res) => {
@@ -56,7 +67,7 @@ app.get('/api/cards', requireAuth, async (req, res) => {
   }
 });
 
-app.post('/api/cards', requireAuth, async (req, res) => {
+app.post('/api/cards', requireAuth, blockDemo, async (req, res) => {
   const { name, rarity, current_price, emoji, image } = req.body;
   try {
     const result = await db.query(
@@ -71,7 +82,7 @@ app.post('/api/cards', requireAuth, async (req, res) => {
   }
 });
 
-app.delete('/api/cards/:id', requireAuth, async (req, res) => {
+app.delete('/api/cards/:id', requireAuth, blockDemo, async (req, res) => {
   try {
     await db.query(
       'DELETE FROM cards WHERE id = $1 AND user_id = $2',
@@ -97,7 +108,7 @@ app.get('/api/wishlist', requireAuth, async (req, res) => {
   }
 });
 
-app.post('/api/wishlist', requireAuth, async (req, res) => {
+app.post('/api/wishlist', requireAuth, blockDemo, async (req, res) => {
   const { name, rarity, current_price, priority, emoji, image } = req.body;
   try {
     const result = await db.query(
@@ -112,13 +123,26 @@ app.post('/api/wishlist', requireAuth, async (req, res) => {
   }
 });
 
-app.delete('/api/wishlist/:id', requireAuth, async (req, res) => {
+app.delete('/api/wishlist/:id', requireAuth, blockDemo, async (req, res) => {
   try {
     await db.query(
       'DELETE FROM wishlist WHERE id = $1 AND user_id = $2',
       [req.params.id, req.user.id]
     );
     res.json({ message: 'Removed from wishlist!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/wishlist/:id/priority', requireAuth, blockDemo, async (req, res) => {
+  const { priority } = req.body;
+  try {
+    await db.query(
+      'UPDATE wishlist SET priority = $1 WHERE id = $2 AND user_id = $3',
+      [priority, req.params.id, req.user.id]
+    );
+    res.json({ message: 'Priority updated!' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -167,8 +191,7 @@ app.get('/api/stats', requireAuth, async (req, res) => {
 });
 
 // PRICE REFRESH
-
-app.post('/api/refresh-prices', requireAuth, async (req, res) => {
+app.post('/api/refresh-prices', requireAuth, blockDemo, async (req, res) => {
   try {
     const settingResult = await db.query(
       "SELECT value, updated_at FROM settings WHERE key = 'last_price_refresh'"
@@ -271,19 +294,6 @@ app.get('/api/search', requireAuth, async (req, res) => {
 
     res.json(cards);
 
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.patch('/api/wishlist/:id/priority', requireAuth, async (req, res) => {
-  const { priority } = req.body;
-  try {
-    await db.query(
-      'UPDATE wishlist SET priority = $1 WHERE id = $2 AND user_id = $3',
-      [priority, req.params.id, req.user.id]
-    );
-    res.json({ message: 'Priority updated!' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

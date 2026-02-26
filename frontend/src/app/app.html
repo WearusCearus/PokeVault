@@ -1,7 +1,7 @@
 <div class="app-shell">
 
   <nav class="navbar">
-    <span class="logo">PokéVault</span>
+    <a routerLink="/" class="logo">PokéVault</a>
 
     @if (user()) {
       <div class="nav-links">
@@ -10,14 +10,30 @@
         <a routerLink="/wishlist"   routerLinkActive="active" class="nav-link">Wishlist</a>
         <a routerLink="/search"     routerLinkActive="active" class="nav-link">Search</a>
       </div>
-
       <div class="nav-user">
-        <span class="user-email">{{ user().email }}</span>
-        <button class="signout-btn" (click)="signOut()">Sign Out</button>
+        @if (demoService.isDemoMode()) {
+          <span class="demo-badge">Demo Mode</span>
+        } @else {
+          <span class="user-email">{{ user().email }}</span>
+        }
+        <button class="signout-btn" (click)="signOut()">
+          {{ demoService.isDemoMode() ? 'Exit Demo' : 'Sign Out' }}
+        </button>
+      </div>
+    } @else {
+      <div class="nav-links">
+        <a routerLink="/demo" class="nav-link">Try Demo</a>
+        <a routerLink="/auth" class="nav-btn">Sign In</a>
       </div>
     }
-
   </nav>
+
+  @if (demoService.isDemoMode()) {
+    <div class="demo-banner">
+      You're viewing a read-only demo. Sign up for a free account to track your own collection.
+      <a routerLink="/auth" class="demo-banner-link">Create account →</a>
+    </div>
+  }
 
   <main class="main">
     <router-outlet></router-outlet>

@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardService, PokemonCard, Card, WishlistItem } from '../../services/card';
+import { DemoService } from '../../services/demo';
 
 @Component({
   selector: 'app-search',
@@ -19,7 +20,9 @@ export class SearchComponent {
   successMessage = signal('');
   pendingCard    = signal<PokemonCard | null>(null);
 
-  constructor(private cardService: CardService) {}
+  constructor(
+    private cardService: CardService, 
+    public demoService: DemoService) {}
 
   search() {
     if (!this.searchQuery()) return;
@@ -46,6 +49,12 @@ export class SearchComponent {
   }
 
   addToCollection(card: PokemonCard) {
+    if (this.demoService.isDemoMode()) {
+      this.errorMessage.set('Demo mode — sign up to add cards to your own collection!');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
     const newCard: Card = {
       name:          card.name,
       rarity:        card.rarity,
@@ -76,6 +85,12 @@ export class SearchComponent {
   }
 
   confirmAddToWishlist(priority: string) {
+    if (this.demoService.isDemoMode()) {
+      this.errorMessage.set('Demo mode — sign up to build your own wishlist!');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      this.pendingCard.set(null);
+      return;
+    }
     const card = this.pendingCard();
     if (!card) return;
 

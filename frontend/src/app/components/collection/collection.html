@@ -7,12 +7,20 @@
     </div>
     <div style="display:flex; gap:10px; align-items:flex-end; flex-direction:column;">
       <div style="display:flex; gap:10px; align-items:center;">
-        <!--<button class="refresh-btn" (click)="refreshPrices()" [disabled]="isRefreshing()">-->
-
-        <!--  {{ isRefreshing() ? 'Refreshing...' : '🔄 Refresh Prices' }}-->
-
-        <!--</button>-->
-
+        <button class="refresh-btn" (click)="refreshPrices()" [disabled]="isRefreshing()">
+          {{ isRefreshing() ? 'Refreshing...' : 'Refresh Prices' }}
+        </button>
+        <select
+          class="sort-select"
+          [value]="sortBy()"
+          (change)="updateSort($any($event.target).value)"
+        >
+          <option value="created_at">Recently Added</option>
+          <option value="price_high">Price: High to Low</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="name">Name: A to Z</option>
+          <option value="rarity">Rarity</option>
+        </select>
         <input
           class="search-input"
           [value]="searchQuery()"
@@ -27,7 +35,7 @@
   </div>
 
   @if (errorMessage()) {
-    <div class="error">⚠️ {{ errorMessage() }}</div>
+    <div class="error">{{ errorMessage() }}</div>
   }
 
   @if (isLoading()) {
@@ -35,17 +43,18 @@
   }
 
   @if (!isLoading()) {
-
-    <div class="add-form">
-      <h2 class="form-title">Add a Card</h2>
-      <div class="form-row">
-        <input class="form-input" [(ngModel)]="newCard.name"          placeholder="Card name" />
-        <input class="form-input" [(ngModel)]="newCard.current_price" placeholder="Price" type="number" />
-        <input class="form-input" [(ngModel)]="newCard.rarity"        placeholder="Rarity" />
-        <input class="form-input" [(ngModel)]="newCard.emoji"         placeholder="Emoji" />
-        <button class="add-btn" (click)="addCard()">Add Card</button>
+    @if (!demoService.isDemoMode()) {
+      <div class="add-form">
+        <h2 class="form-title">Add a Card</h2>
+        <div class="form-row">
+          <input class="form-input" [(ngModel)]="newCard.name"          placeholder="Card name" />
+          <input class="form-input" [(ngModel)]="newCard.current_price" placeholder="Price" type="number" />
+          <input class="form-input" [(ngModel)]="newCard.rarity"        placeholder="Rarity" />
+          <input class="form-input" [(ngModel)]="newCard.emoji"         placeholder="Emoji" />
+          <button class="add-btn" (click)="addCard()">Add Card</button>
+        </div>
       </div>
-    </div>
+    }
 
     @if (filteredCards().length === 0 && !searchQuery()) {
       <p class="empty">No cards yet. Add one above!</p>
@@ -70,8 +79,11 @@
             <p class="card-rarity">{{ card.rarity }}</p>
             <p class="card-price">${{ card.current_price }}</p>
           </div>
+          
 
-          <button class="delete-btn" (click)="deleteCard(card.id!)">🗑</button>
+          @if (!demoService.isDemoMode()) {
+            <button class="delete-btn" (click)="deleteCard(card.id!)">🗑</button>
+          }
 
         </div>
       }

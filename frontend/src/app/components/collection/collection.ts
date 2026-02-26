@@ -2,6 +2,8 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardService, Card } from '../../services/card';
+import { DemoService } from '../../services/demo';
+
 
 @Component({
   selector: 'app-collection',
@@ -18,11 +20,29 @@ export class CollectionComponent implements OnInit {
   errorMessage = signal('');
   searchQuery  = signal('');
 
-  filteredCards = computed(() =>
-    this.cards().filter(card =>
-      card.name.toLowerCase().includes(this.searchQuery().toLowerCase())
-    )
-  );
+sortBy = signal('created_at');
+
+  filteredCards = computed(() => {
+    const query = this.searchQuery().toLowerCase();
+
+    const filtered = this.cards().filter(card =>
+      card.name.toLowerCase().includes(query)
+    );
+
+    const sort = this.sortBy();
+
+    return [...filtered].sort((a, b) => {
+      if (sort === 'price_high') return b.current_price - a.current_price;
+      if (sort === 'price_low')  return a.current_price - b.current_price;
+      if (sort === 'name')       return a.name.localeCompare(b.name);
+      if (sort === 'rarity')     return (a.rarity || '').localeCompare(b.rarity || '');
+      return 0; // default: created_at order from API
+    });
+  });
+
+  updateSort(value: string) {
+    this.sortBy.set(value);
+  }
 
   newCard: Card = {
     name:          '',
@@ -31,7 +51,10 @@ export class CollectionComponent implements OnInit {
     emoji:         ''
   };
 
-  constructor(private cardService: CardService) {}
+  constructor(
+    private cardService: CardService,
+    public demoService: DemoService
+  ) {}
 
   ngOnInit() {
   this.loadCards();
@@ -61,6 +84,8 @@ export class CollectionComponent implements OnInit {
   }
 
   refreshPrices() {
+  if (this.demoService.isDemoMode()) return;
+
   this.isRefreshing.set(true);
 
   this.cardService.refreshPrices().subscribe({
@@ -95,6 +120,11 @@ export class CollectionComponent implements OnInit {
     }
 
   addCard() {
+    if (this.demoService.isDemoMode()) {
+      this.errorMessage.set('Demo mode — sign up to add cards to your own collection!');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
     if (!this.newCard.name) return;
 
     this.cardService.addCard(this.newCard).subscribe({
@@ -110,6 +140,12 @@ export class CollectionComponent implements OnInit {
   }
 
   deleteCard(id: number) {
+    if (this.demoService.isDemoMode()) {
+      this.errorMessage.set('Demo mode — sign up to manage your own collection!');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
     this.cardService.deleteCard(id).subscribe({
       next: () => this.loadCards(),
       error: (err) => {

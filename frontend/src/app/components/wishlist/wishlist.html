@@ -8,8 +8,20 @@
     <div style="display:flex; gap:10px; align-items:flex-end; flex-direction:column;">
       <div style="display:flex; gap:10px; align-items:center;">
         <button class="refresh-btn" (click)="refreshPrices()" [disabled]="isRefreshing()">
-          {{ isRefreshing() ? 'Refreshing...' : '🔄 Refresh Prices' }}
+          {{ isRefreshing() ? 'Refreshing...' : 'Refresh Prices' }}
         </button>
+        <select
+          class="sort-select"
+          [value]="sortBy()"
+          (change)="updateSort($any($event.target).value)"
+        >
+          <option value="created_at">Recently Added</option>
+          <option value="priority">Priority</option>
+          <option value="price_high">Price: High to Low</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="name">Name: A to Z</option>
+          <option value="rarity">Rarity</option>
+        </select>
         <input
           class="search-input"
           [value]="searchQuery()"
@@ -24,7 +36,7 @@
   </div>
 
   @if (errorMessage()) {
-    <div class="error">⚠️ {{ errorMessage() }}</div>
+    <div class="error">{{ errorMessage() }}</div>
   }
 
   @if (isLoading()) {
@@ -32,6 +44,7 @@
   }
 
   @if (!isLoading()) {
+    @if (!demoService.isDemoMode()) {
 
     <div class="add-form">
       <h2 class="form-title">Add to Wishlist</h2>
@@ -48,6 +61,7 @@
         <button class="add-btn" (click)="addItem()">Add to Wishlist</button>
       </div>
     </div>
+    }
 
     @if (filteredItems().length === 0 && !searchQuery()) {
       <p class="empty">No items yet. Add one above!</p>
@@ -84,32 +98,16 @@
           </div>
             @if (openDropdown() === item.id) {
               <div class="priority-dropdown">
-                <button
-                  class="priority-opt"
-                  (click)="setPriority(item, 'low')"
-                  [class.active]="item.priority === 'low'"
-                >
-                  🔵 Low
-                </button>
-                <button
-                  class="priority-opt"
-                  (click)="setPriority(item, 'med')"
-                  [class.active]="item.priority === 'med'"
-                >
-                  🟡 Med
-                </button>
-                <button
-                  class="priority-opt"
-                  (click)="setPriority(item, 'high')"
-                  [class.active]="item.priority === 'high'"
-                >
-                  🔴 High
-                </button>
+                <button class="priority-opt" (click)="setPriority(item, 'low')"  [class.active]="item.priority === 'low'">Low</button>
+                <button class="priority-opt" (click)="setPriority(item, 'med')"  [class.active]="item.priority === 'med'">Med</button>
+                <button class="priority-opt" (click)="setPriority(item, 'high')" [class.active]="item.priority === 'high'">High</button>
               </div>
             }
           </div>
 
-          <button class="delete-btn" (click)="removeItem(item.id!)">🗑</button>
+            @if (!demoService.isDemoMode()) {
+              <button class="delete-btn" (click)="removeItem(item.id!)">🗑</button>
+            }
 
         </div>
       }
