@@ -160,6 +160,54 @@ app.post('/api/refresh-prices', async (req, res) => {
   }
 });
 
+// GET /api/stats — dashboard summary
+app.get('/api/stats', async (req, res) => {
+  try {
+    // Total cards and total collection value
+    const collectionResult = await db.query(`
+      SELECT
+        COUNT(*)                    AS total_cards,
+        COALESCE(SUM(current_price), 0) AS total_value,
+        COALESCE(AVG(current_price), 0) AS avg_price
+      FROM cards
+    `);
+
+    // Total wishlist items
+    const wishlistResult = await db.query(`
+      SELECT COUNT(*) AS total_wishlist
+      FROM wishlist
+    `);
+
+    // Top 5 most valuable cards
+    const topCardsResult = await db.query(`
+      SELECT name, current_price, image, rarity, emoji
+      FROM cards
+      ORDER BY current_price DESC
+      LIMIT 5
+    `);
+
+    // 5 most recently added cards
+    const recentResult = await db.query(`
+      SELECT name, current_price, image, rarity, emoji, created_at
+      FROM cards
+      ORDER BY created_at DESC
+      LIMIT 5
+    `);
+
+    res.json({
+      totalCards:    parseInt(collectionResult.rows[0].total_cards),
+      totalValue:    parseFloat(collectionResult.rows[0].total_value).toFixed(2),
+      avgPrice:      parseFloat(collectionResult.rows[0].avg_price).toFixed(2),
+      totalWishlist: parseInt(wishlistResult.rows[0].total_wishlist),
+      topCards:      topCardsResult.rows,
+      recentCards:   recentResult.rows,
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // SEARCH ROUTE
 

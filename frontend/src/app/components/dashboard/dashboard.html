@@ -1,0 +1,116 @@
+<div class="dashboard">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Your collection at a glance</p>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error">⚠️ {{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Loading your stats...</div>
+  }
+
+  @if (!isLoading() && stats()) {
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+
+      <div class="stat-card">
+        <p class="stat-label">Total Cards</p>
+        <p class="stat-value">{{ stats()!.totalCards }}</p>
+        <a routerLink="/collection" class="stat-link">View collection →</a>
+      </div>
+
+      <div class="stat-card accent">
+        <p class="stat-label">Collection Value</p>
+        <p class="stat-value">${{ stats()!.totalValue }}</p>
+        <p class="stat-hint">Based on market prices</p>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-label">Avg Card Price</p>
+        <p class="stat-value">${{ stats()!.avgPrice }}</p>
+        <p class="stat-hint">Per card in collection</p>
+      </div>
+
+      <div class="stat-card">
+        <p class="stat-label">Wishlist Items</p>
+        <p class="stat-value">{{ stats()!.totalWishlist }}</p>
+        <a routerLink="/wishlist" class="stat-link">View wishlist →</a>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM SECTION -->
+    <div class="bottom-grid">
+
+      <!-- MOST VALUABLE -->
+      <div class="panel">
+        <h2 class="panel-title">Most Valuable</h2>
+
+        @if (stats()!.topCards.length === 0) {
+          <p class="empty">No cards yet</p>
+        }
+
+        <div class="card-list">
+          @for (card of stats()!.topCards; track card.name; let i = $index) {
+            <div class="card-row">
+              <span class="card-rank">#{{ i + 1 }}</span>
+
+              @if (card.image) {
+                <img class="card-thumb" [src]="card.image" [alt]="card.name" />
+              } @else {
+                <div class="card-thumb-emoji">{{ card.emoji || '🃏' }}</div>
+              }
+
+              <div class="card-row-info">
+                <p class="card-row-name">{{ card.name }}</p>
+                <p class="card-row-rarity">{{ card.rarity }}</p>
+              </div>
+
+              <p class="card-row-price">${{ card.current_price }}</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- RECENTLY ADDED -->
+      <div class="panel">
+        <h2 class="panel-title">Recently Added</h2>
+
+        @if (stats()!.recentCards.length === 0) {
+          <p class="empty">No cards yet</p>
+        }
+
+        <div class="card-list">
+          @for (card of stats()!.recentCards; track card.name) {
+            <div class="card-row">
+
+              @if (card.image) {
+                <img class="card-thumb" [src]="card.image" [alt]="card.name" />
+              } @else {
+                <div class="card-thumb-emoji">{{ card.emoji || '🃏' }}</div>
+              }
+
+              <div class="card-row-info">
+                <p class="card-row-name">{{ card.name }}</p>
+                <p class="card-row-rarity">{{ card.rarity }}</p>
+              </div>
+
+              <p class="card-row-price">${{ card.current_price }}</p>
+
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+  }
+
+</div>

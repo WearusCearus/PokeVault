@@ -1,0 +1,239 @@
+.dashboard {
+  width: 100%;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.page-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.error {
+  background: var(--red-dim);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  color: var(--red);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.loading {
+  color: var(--text-muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loading::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── STAT CARDS ──────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.stat-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.stat-card.accent {
+  border-color: rgba(255,215,78,0.2);
+  background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(255,215,78,0.04) 100%);
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.stat-card.accent .stat-value {
+  color: var(--accent);
+}
+
+.stat-link {
+  font-size: 12px;
+  color: var(--blue);
+  text-decoration: none;
+  margin-top: 4px;
+  transition: color 0.15s;
+}
+
+.stat-link:hover {
+  color: #93c5fd;
+}
+
+.stat-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── BOTTOM GRID ─────────────────────────────────────────── */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── PANELS ──────────────────────────────────────────────── */
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+}
+
+/* ── CARD ROWS ───────────────────────────────────────────── */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.card-row:hover {
+  background: var(--bg-elevated);
+}
+
+.card-rank {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.card-thumb {
+  width: 36px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.card-thumb-emoji {
+  width: 36px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.card-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-row-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-row-rarity {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.card-row-price {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}

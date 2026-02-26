@@ -30,6 +30,15 @@ export interface PokemonCard {
   current_price: number;
 }
 
+export interface Stats {
+  totalCards:    number;
+  totalValue:    string;
+  avgPrice:      string;
+  totalWishlist: number;
+  topCards:      Card[];
+  recentCards:   Card[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,6 +47,10 @@ export class CardService {
   private apiUrl = 'http://localhost:3000/api';
 
   constructor(private http: HttpClient) {}
+
+  getStats(): Observable<Stats> {
+    return this.http.get<Stats>(`${this.apiUrl}/stats`);
+  }
 
   searchCards(name: string): Observable<PokemonCard[]> {
     return this.http.get<PokemonCard[]>(`${this.apiUrl}/search?name=${name}`);
