@@ -7,6 +7,7 @@
     </div>
   </div>
 
+  <!-- SEARCH BAR -->
   <div class="search-bar">
     <input
       class="search-input"
@@ -18,6 +19,7 @@
     <button class="search-btn" (click)="search()">Search</button>
   </div>
 
+  <!-- MESSAGES -->
   @if (successMessage()) {
     <div class="success">✅ {{ successMessage() }}</div>
   }
@@ -26,10 +28,12 @@
     <div class="error">⚠️ {{ errorMessage() }}</div>
   }
 
+  <!-- LOADING -->
   @if (isLoading()) {
     <div class="loading">Searching...</div>
   }
 
+  <!-- RESULTS -->
   @if (results().length > 0) {
     <p class="results-count">{{ results().length }} cards found</p>
 
@@ -61,7 +65,7 @@
               + Collection
             </button>
             <button class="wishlist-btn" (click)="addToWishlist(card)">
-              + Wishlist
+              ⭐ Wishlist
             </button>
           </div>
 
@@ -70,8 +74,30 @@
     </div>
   }
 
+  <!-- EMPTY STATE -->
   @if (!isLoading() && results().length === 0 && searchQuery()) {
     <p class="empty">No cards found for "{{ searchQuery() }}"</p>
+  }
+
+  <!-- PRIORITY PROMPT MODAL -->
+  @if (pendingCard()) {
+    <div class="modal-overlay" (click)="cancelPrompt()">
+      <div class="modal" (click)="$event.stopPropagation()">
+
+        <h3 class="modal-title">Add to Wishlist</h3>
+        <p class="modal-card">{{ pendingCard()!.name }}</p>
+        <p class="modal-sub">Select a priority level</p>
+
+        <div class="modal-options">
+          <button class="modal-opt low"  (click)="confirmAddToWishlist('low')">🔵 Low</button>
+          <button class="modal-opt med"  (click)="confirmAddToWishlist('med')">🟡 Med</button>
+          <button class="modal-opt high" (click)="confirmAddToWishlist('high')">🔴 High</button>
+        </div>
+
+        <button class="modal-cancel" (click)="cancelPrompt()">Cancel</button>
+
+      </div>
+    </div>
   }
 
 </div>

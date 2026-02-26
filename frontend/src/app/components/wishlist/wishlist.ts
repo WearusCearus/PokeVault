@@ -119,6 +119,27 @@ export class WishlistComponent implements OnInit {
     });
   }
 
+  openDropdown = signal<number | null>(null);
+
+  toggleDropdown(id: number) {
+    this.openDropdown.set(this.openDropdown() === id ? null : id);
+  }
+
+  setPriority(item: WishlistItem, priority: string) {
+    this.cardService.updatePriority(item.id!, priority).subscribe({
+      next: () => {
+        this.items.update(items =>
+          items.map(i => i.id === item.id ? { ...i, priority } : i)
+        );
+        this.openDropdown.set(null);
+      },
+      error: (err) => {
+        this.errorMessage.set('Could not update priority.');
+        console.error(err);
+      }
+    });
+  }
+
   priorityColor(priority: string): string {
     if (priority === 'high') return '#ff5b5b';
     if (priority === 'med')  return '#ffd74e';

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, from, switchMap } from 'rxjs';
+import { SupabaseService } from './supabase';
 
 export interface Card {
   id?:           number;
@@ -46,46 +47,98 @@ export class CardService {
 
   private apiUrl = 'http://localhost:3000/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private supabase: SupabaseService
+  ) {}
 
-  getStats(): Observable<Stats> {
-    return this.http.get<Stats>(`${this.apiUrl}/stats`);
+  private getHeaders(): Observable<HttpHeaders> {
+    return from(this.supabase.getAccessToken()).pipe(
+      switchMap(token => {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`
+        });
+        return [headers];
+      })
+    );
   }
 
-  searchCards(name: string): Observable<PokemonCard[]> {
-    return this.http.get<PokemonCard[]>(`${this.apiUrl}/search?name=${name}`);
+  private authGet<T>(url: string): Observable<T> {
+    return this.getHeaders().pipe(
+      switchMap(headers => this.http.get<T>(url, { headers }))
+    );
   }
 
-  refreshPrices(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/refresh-prices`, {});
+  private authPost<T>(url: string, body: any): Observable<T> {
+    return this.getHeaders().pipe(
+      switchMap(headers => this.http.post<T>(url, body, { headers }))
+    );
   }
 
-  getLastRefresh(): Observable<any> {
-  return this.http.get(`${this.apiUrl}/last-refresh`);
-}
+  private authDelete<T>(url: string): Observable<T> {
+    return this.getHeaders().pipe(
+      switchMap(headers => this.http.delete<T>(url, { headers }))
+    );
+  }
+
+  // COLLECTION
 
   getCards(): Observable<Card[]> {
-    return this.http.get<Card[]>(`${this.apiUrl}/cards`);
+    return this.authGet<Card[]>(`${this.apiUrl}/cards`);
   }
 
   addCard(card: Card): Observable<any> {
-    return this.http.post(`${this.apiUrl}/cards`, card);
+    return this.authPost(`${this.apiUrl}/cards`, card);
   }
 
   deleteCard(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/cards/${id}`);
+    return this.authDelete(`${this.apiUrl}/cards/${id}`);
   }
 
+  // WISHLIST
+
   getWishlist(): Observable<WishlistItem[]> {
-    return this.http.get<WishlistItem[]>(`${this.apiUrl}/wishlist`);
+    return this.authGet<WishlistItem[]>(`${this.apiUrl}/wishlist`);
   }
 
   addToWishlist(item: WishlistItem): Observable<any> {
-    return this.http.post(`${this.apiUrl}/wishlist`, item);
+    return this.authPost(`${this.apiUrl}/wishlist`, item);
   }
 
   removeFromWishlist(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/wishlist/${id}`);
+    return this.authDelete(`${this.apiUrl}/wishlist/${id}`);
+  }
+
+  private authPatch<T>(url: string, body: any): Observable<T> {
+    return this.getHeaders().pipe(
+      switchMap(headers => this.http.patch<T>(url, body, { headers }))
+    );
+  }
+
+  updatePriority(id: number, priority: string): Observable<any> {
+    return this.authPatch(`${this.apiUrl}/wishlist/${id}/priority`, { priority });
+  }
+
+  // STATS
+
+  getStats(): Observable<Stats> {
+    return this.authGet<Stats>(`${this.apiUrl}/stats`);
+  }
+
+  // PRICES
+
+  refreshPrices(): Observable<any> {
+    return this.authPost(`${this.apiUrl}/refresh-prices`, {});
+  }
+
+  getLastRefresh(): Observable<any> {
+    return this.authGet(`${this.apiUrl}/last-refresh`);
+  }
+
+  // SEARCH
+
+  searchCards(name: string): Observable<PokemonCard[]> {
+    return this.authGet<PokemonCard[]>(`${this.apiUrl}/search?name=${name}`);
   }
 
 }

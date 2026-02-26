@@ -3,20 +3,20 @@
   <nav class="navbar">
     <span class="logo">PokéVault</span>
 
-    <div class="nav-links">
-      <a routerLink="/dashboard"  routerLinkActive="active" class="nav-link">
-        Dashboard
-      </a>
-      <a routerLink="/collection" routerLinkActive="active" class="nav-link">
-        Collection
-      </a>
-      <a routerLink="/wishlist"   routerLinkActive="active" class="nav-link">
-        Wishlist
-      </a>
-      <a routerLink="/search"     routerLinkActive="active" class="nav-link">
-        Search
-      </a>
-    </div>
+    @if (user()) {
+      <div class="nav-links">
+        <a routerLink="/dashboard"  routerLinkActive="active" class="nav-link">Dashboard</a>
+        <a routerLink="/collection" routerLinkActive="active" class="nav-link">Collection</a>
+        <a routerLink="/wishlist"   routerLinkActive="active" class="nav-link">Wishlist</a>
+        <a routerLink="/search"     routerLinkActive="active" class="nav-link">Search</a>
+      </div>
+
+      <div class="nav-user">
+        <span class="user-email">{{ user().email }}</span>
+        <button class="signout-btn" (click)="signOut()">Sign Out</button>
+      </div>
+    }
+
   </nav>
 
   <main class="main">

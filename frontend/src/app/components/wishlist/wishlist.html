@@ -59,8 +59,7 @@
 
     <div class="wishlist-list">
       @for (item of filteredItems(); track item.id) {
-        <div class="wishlist-item">
-
+        <div class="wishlist-item" [style.zIndex]="openDropdown() === item.id ? 10 : 1">
           @if (item.image) {
             <img class="item-image" [src]="item.image" [alt]="item.name" />
           } @else {
@@ -74,11 +73,40 @@
 
           <div class="item-price">${{ item.current_price }}</div>
 
+          <div class="priority-wrapper">
           <div
             class="priority-badge"
             [style.background]="priorityColor(item.priority)"
+            (click)="toggleDropdown(item.id!)"
+            title="Click to change priority"
           >
-            {{ item.priority }}
+            {{ item.priority }} ▾
+          </div>
+            @if (openDropdown() === item.id) {
+              <div class="priority-dropdown">
+                <button
+                  class="priority-opt"
+                  (click)="setPriority(item, 'low')"
+                  [class.active]="item.priority === 'low'"
+                >
+                  🔵 Low
+                </button>
+                <button
+                  class="priority-opt"
+                  (click)="setPriority(item, 'med')"
+                  [class.active]="item.priority === 'med'"
+                >
+                  🟡 Med
+                </button>
+                <button
+                  class="priority-opt"
+                  (click)="setPriority(item, 'high')"
+                  [class.active]="item.priority === 'high'"
+                >
+                  🔴 High
+                </button>
+              </div>
+            }
           </div>
 
           <button class="delete-btn" (click)="removeItem(item.id!)">🗑</button>
