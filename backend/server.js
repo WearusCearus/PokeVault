@@ -7,7 +7,12 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // MIDDLEWARE
-app.use(cors({ origin: 'http://localhost:4200' }));
+app.use(cors({
+  origin: [
+    'http://localhost:4200',
+    'https://pokevault-production-0f04.up.railway.app'
+  ]
+}));
 app.use(express.json());
 
 // DEMO USER

@@ -45,7 +45,7 @@ export interface Stats {
 })
 export class CardService {
 
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = 'https://pokevault-production-0f04.up.railway.app/api';
 
   constructor(
     private http: HttpClient,
